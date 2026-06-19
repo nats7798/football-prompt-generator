@@ -1,0 +1,1052 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Football Match Prompt Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pitch-green: #062b21;
+      --pitch-green-light: #0c3f31;
+      --pitch-line: #1fa86a;
+      --amber: #ffb347;
+      --amber-soft: #ffcf80;
+      --text-main: #f5f5f5;
+      --text-muted: #c3c7c7;
+      --danger: #ff6b6b;
+      --card-bg: #0b3327;
+      --border-soft: #1b4a3a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #145c3f 0, #031712 45%, #010806 100%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(145deg, rgba(10, 60, 40, 0.96), rgba(3, 20, 14, 0.98));
+      border-radius: 18px;
+      border: 1px solid var(--pitch-line);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.7),
+        0 24px 60px rgba(0, 0, 0, 0.85);
+      padding: 24px 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app::before,
+    .app::after {
+      content: "";
+      position: absolute;
+      border: 2px solid rgba(31, 168, 106, 0.35);
+      border-radius: 50%;
+      width: 260px;
+      height: 260px;
+      top: -120px;
+      right: -80px;
+      pointer-events: none;
+    }
+
+    .app::after {
+      width: 180px;
+      height: 180px;
+      top: auto;
+      bottom: -90px;
+      left: -60px;
+      border-radius: 0;
+      border-width: 2px 0 0 2px;
+    }
+
+    h1, h2, h3, .label, .pill {
+      font-family: "Barlow Condensed", system-ui, sans-serif;
+      letter-spacing: 0.03em;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-pill {
+      font-size: 13px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 179, 71, 0.7);
+      color: var(--amber-soft);
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(195, 199, 199, 0.35);
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .pitch-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      border: 1px solid rgba(31, 168, 106, 0.7);
+      background: radial-gradient(circle at 30% 20%, #1fa86a 0, #0b3327 40%, #031712 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pitch-icon::before,
+    .pitch-icon::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(245, 245, 245, 0.4);
+    }
+
+    .pitch-icon::before {
+      width: 70%;
+      height: 70%;
+      border-radius: 10px;
+    }
+
+    .pitch-icon::after {
+      width: 40%;
+      height: 40%;
+      border-radius: 50%;
+    }
+
+    .ball-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff 0, #f5f5f5 40%, #c3c7c7 100%);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+      position: relative;
+      z-index: 1;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(31, 168, 106, 0.08) 0, rgba(11, 51, 39, 0.96) 40%, rgba(3, 20, 14, 0.98) 100%);
+      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      padding: 14px 14px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid rgba(255, 179, 71, 0.12);
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .card-header small {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--amber-soft);
+      margin-bottom: 4px;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .vs-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 179, 71, 0.7);
+      color: var(--amber-soft);
+      font-family: "Barlow Condensed", system-ui, sans-serif;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: center;
+      background: radial-gradient(circle at top, rgba(255, 179, 71, 0.25), transparent 60%);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(195, 199, 199, 0.35);
+      background: rgba(3, 20, 14, 0.9);
+      color: var(--text-main);
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(195, 199, 199, 0.6);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 1px rgba(255, 179, 71, 0.4);
+      background: rgba(3, 20, 14, 0.98);
+    }
+
+    .field-group {
+      margin-bottom: 10px;
+    }
+
+    .inline-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 8px;
+    }
+
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: "Barlow Condensed", system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--amber) 0, #ff8c42 40%, #ffb347 100%);
+      color: #1b1205;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.7),
+        0 10px 25px rgba(0, 0, 0, 0.7);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.7),
+        0 14px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.7),
+        0 6px 16px rgba(0, 0, 0, 0.8);
+    }
+
+    .btn-secondary {
+      border-radius: 999px;
+      border: 1px solid rgba(195, 199, 199, 0.5);
+      padding: 6px 12px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: "Barlow Condensed", system-ui, sans-serif;
+      background: rgba(3, 20, 14, 0.9);
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.1s ease, border-color 0.1s ease, transform 0.08s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(11, 51, 39, 0.95);
+      border-color: var(--amber-soft);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(0);
+    }
+
+    .btn-icon {
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 260px;
+      resize: vertical;
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .helper-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(31, 168, 106, 0.6);
+      color: var(--amber-soft);
+      background: rgba(6, 43, 33, 0.7);
+    }
+
+    .section-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0 0 6px;
+      color: var(--amber-soft);
+    }
+
+    .platform-list,
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .platform-list li,
+    .steps-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .bullet {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 179, 71, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--amber-soft);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .steps-list li .bullet {
+      border-color: rgba(31, 168, 106, 0.8);
+      color: var(--pitch-line);
+    }
+
+    .disclaimer {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px dashed rgba(255, 179, 71, 0.7);
+      background: rgba(20, 12, 5, 0.85);
+      font-size: 11px;
+      color: var(--amber-soft);
+      line-height: 1.4;
+    }
+
+    .disclaimer strong {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-text.success {
+      color: var(--pitch-line);
+    }
+
+    .status-text.error {
+      color: var(--danger);
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .mini-card {
+      border-radius: 10px;
+      border: 1px solid rgba(195, 199, 199, 0.3);
+      padding: 6px 8px;
+      background: rgba(3, 20, 14, 0.9);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mini-card-title {
+      font-family: "Barlow Condensed", system-ui, sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--amber-soft);
+      margin-bottom: 2px;
+    }
+
+    .footnote {
+      margin-top: 10px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="title-block">
+        <h1>
+          Football Match Prompt Generator
+          <span class="title-pill">AI-ready analysis script</span>
+        </h1>
+        <div class="subtitle">
+          Type the teams once—get a full, structured prompt you can paste into Grok, ChatGPT, Gemini, or Meta AI.
+        </div>
+        <div class="badge-row">
+          <span class="pill">Live data: SofaScore · OddsPortal · SportsMole · WhoScored</span>
+          <span class="pill">1X2 &amp; Over/Under 2.5</span>
+          <span class="pill">Value edge &amp; match narrative</span>
+        </div>
+      </div>
+      <div class="pitch-icon">
+        <div class="ball-dot"></div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- LEFT: INPUTS & HOW-TO -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Match setup</h2>
+          <small>Fill this once per game</small>
+        </div>
+
+        <div class="field-group">
+          <div class="label">Teams</div>
+          <div class="input-row">
+            <input id="homeTeam" type="text" placeholder="Home team (e.g. Liverpool)" />
+            <div class="vs-pill">vs</div>
+            <input id="awayTeam" type="text" placeholder="Away team (e.g. Manchester City)" />
+          </div>
+          <div class="helper-text">Team names will be injected throughout the generated AI prompt.</div>
+        </div>
+
+        <div class="field-group inline-row">
+          <div>
+            <div class="label">Competition (optional)</div>
+            <select id="competition">
+              <option value="">— Leave blank if not important —</option>
+              <option>Premier League</option>
+              <option>La Liga</option>
+              <option>Serie A</option>
+              <option>Bundesliga</option>
+              <option>Ligue 1</option>
+              <option>Champions League</option>
+              <option>Europa League</option>
+              <option>Conference League</option>
+              <option>Domestic Cup</option>
+              <option>International (National Teams)</option>
+            </select>
+          </div>
+          <div>
+            <div class="label">Match date (optional)</div>
+            <input id="matchDate" type="date" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="label">Prompt style</div>
+          <select id="tone">
+            <option value="neutral">Neutral, analytical tone</option>
+            <option value="confident">More confident, bolder predictions</option>
+            <option value="cautious">More cautious, risk-aware tone</option>
+          </select>
+          <div class="helper-text">This slightly adjusts how the AI phrases its narrative and risk section.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="generateBtn">
+            <span class="btn-icon">⚽</span>
+            Generate AI analysis prompt
+          </button>
+          <span id="status" class="status-text"></span>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(195,199,199,0.25); margin: 12px 0;" />
+
+        <h3 class="section-title">Where to use this</h3>
+        <ul class="platform-list">
+          <li>
+            <span class="bullet">1</span>
+            <span><strong>Grok</strong> — paste into a new chat and ensure browsing/tools are enabled.</span>
+          </li>
+          <li>
+            <span class="bullet">2</span>
+            <span><strong>ChatGPT</strong> — use a model with browsing/tools (e.g. latest with web access).</span>
+          </li>
+          <li>
+            <span class="bullet">3</span>
+            <span><strong>Gemini</strong> — paste into a new conversation and allow it to access the web.</span>
+          </li>
+          <li>
+            <span class="bullet">4</span>
+            <span><strong>Meta AI</strong> — paste into chat and confirm it can open external sites.</span>
+          </li>
+        </ul>
+
+        <h3 class="section-title" style="margin-top: 10px;">How to use</h3>
+        <ul class="steps-list">
+          <li>
+            <span class="bullet">1</span>
+            <span>Enter the <strong>home</strong> and <strong>away</strong> teams (plus competition/date if you want).</span>
+          </li>
+          <li>
+            <span class="bullet">2</span>
+            <span>Click <strong>“Generate AI analysis prompt”</strong> to build a long, structured instruction.</span>
+          </li>
+          <li>
+            <span class="bullet">3</span>
+            <span>Use <strong>“Copy prompt”</strong> and paste it into Grok, ChatGPT, Gemini, or Meta AI.</span>
+          </li>
+          <li>
+            <span class="bullet">4</span>
+            <span>Let the AI browse <strong>SofaScore, OddsPortal, SportsMole, and WhoScored</strong> and wait for the full report.</span>
+          </li>
+          <li>
+            <span class="bullet">5</span>
+            <span>Use the output for <strong>research and entertainment</strong>—not as financial or betting advice.</span>
+          </li>
+        </ul>
+
+        <div class="mini-grid">
+          <div class="mini-card">
+            <div class="mini-card-title">Data sources to browse</div>
+            <div>• SofaScore — stats, form, lineups<br />• OddsPortal — live odds &amp; movement<br />• SportsMole — previews<br />• WhoScored — ratings &amp; styles</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-card-title">Key outputs requested</div>
+            <div>• Scoreline prediction<br />• 1X2 &amp; O/U 2.5 fair odds<br />• One best value bet<br />• Narrative &amp; risks</div>
+          </div>
+        </div>
+
+        <div class="disclaimer">
+          <strong>Important:</strong> The “edge %” in the generated prompt is <u>self‑referential</u> — the AI compares its own internal probability estimate against the bookmaker’s implied probability. This is <u>not</u> independent confirmation of true value and may be wrong or unstable.<br /><br />
+          This tool and the generated prompts are for <strong>research and entertainment purposes only</strong> and do <strong>not</strong> constitute betting, financial, or investment advice. Always make your own decisions and never stake money you cannot afford to lose.
+        </div>
+      </div>
+
+      <!-- RIGHT: PROMPT OUTPUT -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Generated AI prompt</h2>
+          <small>Copy &amp; paste into your AI of choice</small>
+        </div>
+
+        <textarea id="promptOutput" placeholder="Your structured AI prompt will appear here after you generate it."></textarea>
+
+        <div class="btn-row">
+          <button class="btn-secondary" id="copyBtn">
+            <span class="btn-icon">📋</span>
+            Copy prompt
+          </button>
+          <span id="copyStatus" class="status-text"></span>
+        </div>
+
+        <div class="tag-row">
+          <span class="tag">Player form &amp; injuries</span>
+          <span class="tag">Coach &amp; tactics</span>
+          <span class="tag">Home advantage &amp; rivalry</span>
+          <span class="tag">Referee &amp; conditions</span>
+          <span class="tag">Odds &amp; market signals</span>
+          <span class="tag">xG &amp; goal trends</span>
+          <span class="tag">1X2 &amp; O/U 2.5 fair odds</span>
+          <span class="tag">Single best value bet</span>
+        </div>
+
+        <div class="footnote">
+          Tip: You can lightly edit the generated prompt before pasting if you want to tweak emphasis or tone.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function buildPrompt(home, away, competition, matchDate, tone) {
+      const compText = competition ? competition.trim() : "";
+      const dateText = matchDate ? matchDate.trim() : "";
+      const contextParts = [];
+
+      if (compText) {
+        contextParts.push(`Competition: ${compText}`);
+      }
+      if (dateText) {
+        contextParts.push(`Match date: ${dateText}`);
+      }
+
+      const contextLine = contextParts.length
+        ? `Context: ${contextParts.join(" | ")}.`
+        : "Context: Use the most up-to-date competitive context you can find for this fixture.";
+
+      let toneInstruction = "";
+      if (tone === "confident") {
+        toneInstruction =
+          "Use a slightly more confident, decisive tone in your narrative and recommendations, while still acknowledging uncertainty and risks.";
+      } else if (tone === "cautious") {
+        toneInstruction =
+          "Use a slightly more cautious, risk-aware tone in your narrative and recommendations, clearly highlighting uncertainty and downside risks.";
+      } else {
+        toneInstruction =
+          "Use a neutral, analytical tone in your narrative and recommendations, balancing conviction with clear acknowledgement of uncertainty.";
+      }
+
+      return `You are an advanced football match analyst with live web access and strong statistical reasoning.
+
+I want you to produce a deep, structured pre‑match analysis and betting‑style breakdown for the following fixture:
+
+- Home team: ${home}
+- Away team: ${away}
+${contextLine}
+
+Your task is to:
+1) BROWSE SPECIFIC LIVE DATA SOURCES
+2) RATE ~30 KEY VARIABLES ACROSS MULTIPLE CATEGORIES
+3) CALCULATE WIN PROBABILITIES & FAIR ODDS FOR 1X2 AND OVER/UNDER 2.5
+4) OUTPUT A FINAL, STRUCTURED PREDICTION WITH ONE SINGLE BEST VALUE BET
+
+────────────────────────────────
+1. DATA SOURCES YOU MUST BROWSE
+────────────────────────────────
+Actively browse and use these four sources (plus any others you find helpful):
+
+1) SofaScore
+   - Use for: recent form, results, league position, goals scored/conceded, xG/xGA (if available), lineups, injuries, suspensions, player ratings, and team momentum.
+   - Site: "SofaScore ${home} vs ${away}" or each team individually.
+
+2) OddsPortal
+   - Use for: current and recent 1X2 odds, Over/Under 2.5 odds, odds movement, closing line tendencies, and market consensus.
+   - Site: "OddsPortal ${home} ${away}" for the specific match.
+
+3) SportsMole
+   - Use for: match previews, predicted lineups, tactical notes, injury news, suspensions, and narrative context.
+   - Site: "SportsMole ${home} vs ${away} preview".
+
+4) WhoScored
+   - Use for: player ratings, team strengths/weaknesses, playing styles, formation tendencies, and key players.
+   - Site: "WhoScored ${home}" and "WhoScored ${away}".
+
+When you reference data, briefly indicate which source it came from (e.g. SofaScore, OddsPortal, SportsMole, WhoScored).
+
+────────────────────────────────
+2. RATE ~30 VARIABLES ACROSS CATEGORIES
+────────────────────────────────
+For each category below, rate the relevant variables on a simple qualitative scale (e.g. Strong / Moderate / Weak, or High / Medium / Low) and, where possible, connect them to quantitative data (recent results, xG, odds, etc.).
+
+A. PLAYER FACTORS (MICRO LEVEL)
+Evaluate for BOTH ${home} and ${away}:
+
+1) Recent player form
+   - Key attackers: goals, xG, shots, assists, chances created.
+   - Key defenders: tackles, interceptions, aerial duels, errors leading to goals.
+   - Use SofaScore and WhoScored ratings and stats.
+
+2) Injuries & suspensions
+   - Which important players are missing?
+   - Are absences concentrated in defence, midfield, or attack?
+   - Rate impact: Low / Medium / High.
+
+3) Fatigue & rotation
+   - Recent schedule: number of matches in last 7–14 days.
+   - Travel load, extra‑time, or long away trips.
+   - Likely rotation or heavy minutes for key players.
+
+4) Squad depth & bench quality
+   - How strong are the likely substitutes?
+   - Does one team have clearly better depth?
+
+5) Key player matchups
+   - Example: star winger vs weak full‑back, dominant striker vs small centre‑backs.
+   - Highlight any obvious mismatch that could tilt the game.
+
+B. COACH, TACTICS & GAMEPLAN
+Evaluate for BOTH teams:
+
+6) Coach quality & stability
+   - Track record, tenure, and recent pressure (secure vs under threat).
+   - Tactical flexibility vs rigidity.
+
+7) Formation & tactical identity
+   - Typical formation(s) (e.g. 4‑3‑3, 3‑5‑2).
+   - Style: high press vs low block, possession vs direct, wide vs central attacks.
+
+8) In‑game management
+   - Substitution patterns, tactical adjustments, ability to change a game from the bench.
+
+9) Tactical matchup
+   - How does ${home}'s style interact with ${away}'s style?
+   - Does one team’s approach naturally exploit the other’s weaknesses?
+
+C. MATCH CONTEXT & INTANGIBLES
+10) Home advantage
+    - Historical home performance for ${home}.
+    - Crowd intensity, stadium size, travel distance for ${away}.
+
+11) Head‑to‑head (H2H)
+    - Recent H2H results.
+    - Any clear pattern (e.g. home team dominance, high‑scoring, low‑scoring)?
+
+12) Rivalry & motivation
+    - Is this a derby or rivalry match?
+    - Motivation factors: title race, relegation battle, European spots, dead rubber, etc.
+
+13) Schedule context
+    - Are either team distracted by upcoming or just‑played cup/European matches?
+    - Rotation risk due to fixture congestion.
+
+D. REFEREE & CONDITIONS
+14) Referee profile
+    - Cards per game, penalties per game, tolerance for physical play.
+    - Does this favour one team’s style?
+
+15) Pitch & weather
+    - Pitch quality (if known), weather (rain, wind, heat).
+    - Impact on pressing, passing, and goal expectation.
+
+E. ODDS & MARKET SIGNALS
+Use OddsPortal for this section:
+
+16) Current 1X2 odds
+    - Home win, Draw, Away win.
+    - Convert to implied probabilities (after removing overround).
+
+17) Over/Under 2.5 odds
+    - Over 2.5, Under 2.5.
+    - Convert to implied probabilities (after removing overround).
+
+18) Odds movement
+    - Has there been significant movement on any outcome?
+    - Are sharp books or the market leaning towards one side or total?
+
+19) Market consensus vs outliers
+    - Are some bookmakers notably different from the market average?
+    - What might that imply?
+
+F. STATISTICAL TRENDS & METRICS
+Use SofaScore, WhoScored, and any other reliable stats sources:
+
+20) Recent results & form
+    - Last 5–10 matches for each team.
+    - Wins/draws/losses, goals scored and conceded.
+
+21) Expected goals (xG)
+    - xG for and against in recent matches (if available).
+    - Are results aligned with xG, or is there over/under‑performance?
+
+22) Goal trends
+    - Frequency of Over/Under 2.5 in recent matches.
+    - Both Teams To Score (BTTS) rates.
+
+23) Home/away splits
+    - ${home} at home vs overall.
+    - ${away} away vs overall.
+
+24) Defensive solidity
+    - Clean sheets, shots conceded, big chances conceded.
+
+25) Attacking strength
+    - Shots, big chances, xG, conversion rates.
+
+26) Set‑piece threat
+    - Goals from corners/free‑kicks.
+    - Height advantage, aerial duel success.
+
+27) Game state tendencies
+    - Do they often score first or concede first?
+    - Ability to come back from losing positions.
+
+28) Pace & tempo
+    - High‑tempo, end‑to‑end vs slow, controlled matches.
+
+29) Variance & volatility
+    - Are their matches typically chaotic with many swings, or controlled and low‑variance?
+
+30) Any other notable statistical pattern
+    - Anything that clearly influences goal expectation or win probabilities.
+
+────────────────────────────────
+3. CALCULATE WIN PROBABILITIES & FAIR ODDS
+────────────────────────────────
+Using all of the above information (player factors, tactics, context, referee, conditions, odds, and stats):
+
+A. ESTIMATE TRUE WIN PROBABILITIES
+Provide your best estimated probabilities for:
+
+- P(Home win: ${home}) = ?%
+- P(Draw) = ?%
+- P(Away win: ${away}) = ?%
+
+Make sure they sum to 100%. Briefly justify the shape of this distribution (why one side is favoured, or why it is balanced).
+
+B. CONVERT TO FAIR ODDS (1X2)
+Convert your estimated probabilities into fair odds (without overround):
+
+- Fair odds Home win (1)
+- Fair odds Draw (X)
+- Fair odds Away win (2)
+
+Then compare these fair odds to the current market odds from OddsPortal and comment on where the market seems too short or too big relative to your model.
+
+C. OVER/UNDER 2.5 GOALS
+Estimate:
+
+- P(Over 2.5 goals) = ?%
+- P(Under 2.5 goals) = ?%
+
+Convert these into fair odds and compare them to the current Over/Under 2.5 odds from OddsPortal. Highlight whether the market is more bullish or bearish on goals than your model.
+
+────────────────────────────────
+4. FINAL STRUCTURED OUTPUT FORMAT
+────────────────────────────────
+Present your final answer in the following structured format, using clear headings and bullet points:
+
+1) MATCH OVERVIEW
+   - Fixture: ${home} vs ${away}
+   - ${contextLine}
+   - Very short summary of how you expect the game to look (e.g. cagey vs open, one‑sided vs balanced).
+
+2) KEY FACTOR SUMMARY (BULLET POINTS)
+   - Player factors: [2–4 bullets]
+   - Coach & tactics: [2–4 bullets]
+   - Match context & intangibles: [2–4 bullets]
+   - Referee & conditions: [1–3 bullets]
+   - Odds & market signals: [2–4 bullets]
+   - Statistical trends: [3–5 bullets]
+
+3) PREDICTED SCORELINE
+   - Give a single most likely scoreline (e.g. 2–1, 1–1, 3–0).
+   - Optionally mention 1–2 alternative plausible scorelines.
+
+4) WIN PROBABILITIES & FAIR ODDS (1X2)
+   - P(Home win: ${home}) = ?%  → Fair odds: ?
+   - P(Draw) = ?%              → Fair odds: ?
+   - P(Away win: ${away}) = ?% → Fair odds: ?
+   - Brief commentary comparing your fair odds to the current market odds from OddsPortal.
+
+5) OVER/UNDER 2.5 GOALS
+   - P(Over 2.5) = ?% → Fair odds: ?
+   - P(Under 2.5) = ?% → Fair odds: ?
+   - Brief commentary comparing your fair odds to the current market odds from OddsPortal.
+   - State whether you expect a more open or more cagey game and why.
+
+6) ONE SINGLE BEST VALUE BET
+   - Market: [e.g. Home win, Away +0.5, Over 2.5, Under 2.5, BTTS, etc.]
+   - Bookmaker odds used (from OddsPortal): ?
+   - Implied probability from those odds: ?%
+   - Your estimated true probability: ?%
+   - Edge % (self‑referential):
+     edge% = (your probability – implied probability) in percentage points.
+   - Confidence level: Low / Medium / High (relative, not absolute).
+   - Reasoning: 3–6 bullet points explaining why this selection appears to have value based on the data and context.
+
+   IMPORTANT: Clearly state that this “edge %” is based on your own internal probability estimate vs the bookmaker’s implied probability, and is NOT independent confirmation of true value.
+
+7) MATCH NARRATIVE
+   - 2–5 paragraphs describing how you expect the game to play out:
+     • Likely phases of the match (early, mid, late).
+     • Which team is likely to control possession and territory.
+     • Where the main threats will come from (wide areas, central overloads, set pieces, transitions).
+     • How game state (first goal, red cards, etc.) could change the dynamic.
+
+8) KEY RISKS & UNCERTAINTIES
+   - List 4–8 specific risks that could invalidate your view, such as:
+     • Uncertain lineups or late injury news.
+     • High variance playing styles.
+     • Weather or pitch conditions.
+     • Referee decisions (penalties, red cards).
+     • Small sample sizes or noisy recent form.
+   - Emphasise that all probabilities are estimates and can be wrong.
+
+9) DATA SOURCES USED
+   - Explicitly list the main sources you actually used in this analysis, for example:
+     • SofaScore (stats, form, lineups, injuries)
+     • OddsPortal (odds, market movement)
+     • SportsMole (preview, lineups, narrative)
+     • WhoScored (ratings, styles, strengths/weaknesses)
+     • Any other reputable sources you consulted
+
+────────────────────────────────
+5. TONE & DISCLAIMERS
+────────────────────────────────
+${toneInstruction}
+
+Be explicit that:
+- All probabilities and edges are estimates and may be wrong.
+- The “edge %” is self‑referential: it compares YOUR internal probability estimate to the bookmaker’s implied probability and is NOT independent confirmation of true value.
+- This analysis is for research and entertainment purposes only and does NOT constitute betting, financial, or investment advice.
+
+Now, perform the full analysis for:
+${home} vs ${away}
+and produce the structured output as described above.`;
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      const home = document.getElementById("homeTeam").value.trim();
+      const away = document.getElementById("awayTeam").value.trim();
+      const competition = document.getElementById("competition").value;
+      const matchDate = document.getElementById("matchDate").value;
+      const tone = document.getElementById("tone").value;
+      const statusEl = document.getElementById("status");
+      const outputEl = document.getElementById("promptOutput");
+      const copyStatusEl = document.getElementById("copyStatus");
+
+      statusEl.textContent = "";
+      copyStatusEl.textContent = "";
+
+      if (!home || !away) {
+        statusEl.textContent = "Please enter both home and away teams.";
+        statusEl.className = "status-text error";
+        return;
+      }
+
+      const prompt = buildPrompt(home, away, competition, matchDate, tone);
+      outputEl.value = prompt;
+      statusEl.textContent = "Prompt generated. You can now copy and paste it into your AI.";
+      statusEl.className = "status-text success";
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const outputEl = document.getElementById("promptOutput");
+      const copyStatusEl = document.getElementById("copyStatus");
+      copyStatusEl.textContent = "";
+
+      if (!outputEl.value.trim()) {
+        copyStatusEl.textContent = "Nothing to copy yet—generate a prompt first.";
+        copyStatusEl.className = "status-text error";
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(outputEl.value);
+        copyStatusEl.textContent = "Prompt copied to clipboard.";
+        copyStatusEl.className = "status-text success";
+      } catch (err) {
+        copyStatusEl.textContent = "Could not access clipboard. Please copy manually.";
+        copyStatusEl.className = "status-text error";
+      }
+    });
+  </script>
+</body>
+</html>
+```
